@@ -15,7 +15,8 @@ var locationData = {
 // gets translation data
 function updateLocationData(){
 	$.ajax({
-		url: 'http://www.herdict.org/action/ajax/plugin/init-currentLocation/',
+		// TODO: Add IP Get var or something because right now it returns our server's location data
+		url: 'ajax/request/currentLocation',
 		success: function (data, status, jqxhr){
 			// parse data
 			var clean = cleanJSON(jqxhr.responseText);
@@ -32,6 +33,7 @@ function updateLocationData(){
 $(document).ready(function (){
 	updateLocationData();
 	// Actually put data into select fields when open page
+	// TODO: If you start on #report, this will never fire
 	$("#report").one("pageinit", loadOtherFields);
 });
 
@@ -40,7 +42,7 @@ function loadOtherFields(){
 	// init fields
 	for (var i = 0; i < toLoad.length; i++){
 		$.ajax({
-			url: 'http://www.herdict.org/action/ajax/plugin/init-'+toLoad[i]+'/',
+			url: 'ajax/request/'+toLoad[i],
 			// test if we can access herdict, if we can use its data
 			success: (function (section){
 				return (function(data, status, jqxhr) {
@@ -50,11 +52,6 @@ function loadOtherFields(){
 						populateFields(section, fields[key]);
 					}
 					loadedData(section);
-					// store data in db for later use
-					var db = connectToBackupDB();
-					db.transaction(function (t){
-						t.executeSql("REPLACE INTO backup (keyTxt, valueTxt) VALUES (?, ?)", [section, jqxhr.responseText]);
-					});
 				});
 			})(toLoad[i])
 		});
@@ -105,7 +102,7 @@ function queueUp(accessibleBoolean){
 		// TODO: add report.sourceID
 		var sourceId = "1";
 		// TODO: Replace dev2 with www
-		var reportRequest = "http://dev2.herdict.org/action/ajax/plugin/report?" + (accessibleBoolean ? "siteAccessible" : "siteInaccessible") + "&report.url=" + encodeURIComponent(url) + "&report.country.shortName=" + encodeURIComponent(country) + "&report.ispName=" + encodeURIComponent(isp) + "&report.location=" + encodeURIComponent(location) + "&report.interest=" + encodeURIComponent(interest) + "&report.reason=" + encodeURIComponent(reason) + "&report.tag=" + encodeURIComponent(category) + "&report.comments=" + encodeURIComponent(comment) + "&defaultCountryCode=" + encodeURIComponent(locationData.countryShort) + "&defaultISPName=" + encodeURIComponent(locationData.ispName) + "&report.sourceId=" + sourceId + "&encoding=ROT13"; 
+		var reportRequest = "ajax/report?" + (accessibleBoolean ? "siteAccessible" : "siteInaccessible") + "&report.url=" + encodeURIComponent(url) + "&report.country.shortName=" + encodeURIComponent(country) + "&report.ispName=" + encodeURIComponent(isp) + "&report.location=" + encodeURIComponent(location) + "&report.interest=" + encodeURIComponent(interest) + "&report.reason=" + encodeURIComponent(reason) + "&report.tag=" + encodeURIComponent(category) + "&report.comments=" + encodeURIComponent(comment) + "&defaultCountryCode=" + encodeURIComponent(locationData.countryShort) + "&defaultISPName=" + encodeURIComponent(locationData.ispName) + "&report.sourceId=" + sourceId + "&encoding=ROT13"; 
 		$.ajax({
 			url: reportRequest
 		});
@@ -152,7 +149,7 @@ function loadRandomDomain(){
 		if (typeof(randomQueue) == 'undefined' || currentListId != listId){
 			currentListId = listId;
 			$.ajax({
-				url: 'http://herdict.podconsulting.net/ajax/lists/' + listId + '/pages',
+				url: 'ajax/list/' + listId,
 				success: function (data, status, jqxhr){
 					randomQueue = $.parseJSON(jqxhr.responseText);
 					randomQueue.reverse(); // so that the most important item is last and can easily be popped
@@ -335,7 +332,7 @@ function checkLink(){
 	var currentURL = $("#urlCheckField")[0].value;
 	currentURL = prepareURL(currentURL);
 	$.ajax({
-		url: 'http://www.herdict.org/action/ajax/plugin/site/'+currentURL+'/'+locationData.countryShort+'/ROT13/',
+		url: 'ajax/site/'+currentURL+'/'+locationData.countryShort+'/ROT13/',
 		success: function(data, status, jqxhr) {
 			var clean = cleanJSON(jqxhr.responseText);
 			var siteData = $.parseJSON(clean);
@@ -401,7 +398,7 @@ $(document).one("pageshow", function (){
 
 function getTopSites(){
 	$.ajax({
-		url: 'http://www.herdict.org/explore/module/topsites?fc=' + locationData.countryShort,
+		url: 'ajax/topsites/' + locationData.countryShort,
 		success: function (data, status, jqxhr){
 			// convert to DOM object so I can traverse it for good parts
 			var DOMObj = $('<div>' + jqxhr.responseText + '</div>');
