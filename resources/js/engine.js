@@ -13,7 +13,7 @@ var locationData = {
 };
 
 // gets translation data
-function updateTranslationData(){
+function updateLocationData(){
 	$.ajax({
 		url: 'http://www.herdict.org/action/ajax/plugin/init-currentLocation/',
 		success: function (data, status, jqxhr){
@@ -25,12 +25,12 @@ function updateTranslationData(){
 		}
 	});
 	// update later
-	setTimeout(updateTranslationData, 6000);
+	setTimeout(updateLocationData, 60000);
 }
 
 // key init data
 $(document).ready(function (){
-	updateTranslationData();
+	updateLocationData();
 	// Actually put data into select fields when open page
 	$("#report").one("pageinit", loadOtherFields);
 });
@@ -101,22 +101,17 @@ function queueUp(accessibleBoolean){
 		var url = prepareURL($("#urlField")[0].value);
 		var accessible = (accessibleBoolean ? 1 : 0);
 		var comment = $("#commentField")[0].value;
-		// store in db
-		var db = connectToQueue();
-		db.transaction(function (t){
-			t.executeSql("INSERT INTO toSendQueue (category, country, location, interest, reason, isp, url, accessible, comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", 
-				[category, country, location, interest, reason, isp, url, accessible, comment],
-				function (t, r){
-					// begin checking until I can dequeue
-					checkHerdict();
-				},
-				function (t, e){
-					alert(e.message);
-				}
-			);
+		// report
+		// TODO: add report.sourceID
+		var sourceId = "1";
+		// TODO: Replace dev2 with www
+		var reportRequest = "http://dev2.herdict.org/action/ajax/plugin/report?" + (accessibleBoolean ? "siteAccessible" : "siteInaccessible") + "&report.url=" + encodeURIComponent(url) + "&report.country.shortName=" + encodeURIComponent(country) + "&report.ispName=" + encodeURIComponent(isp) + "&report.location=" + encodeURIComponent(location) + "&report.interest=" + encodeURIComponent(interest) + "&report.reason=" + encodeURIComponent(reason) + "&report.tag=" + encodeURIComponent(category) + "&report.comments=" + encodeURIComponent(comment) + "&defaultCountryCode=" + encodeURIComponent(locationData.countryShort) + "&defaultISPName=" + encodeURIComponent(locationData.ispName) + "&report.sourceId=" + sourceId + "&encoding=ROT13"; 
+		$.ajax({
+			url: reportRequest
 		});
+		// thank
 		if (!randomMode){
-			navigator.notification.alert("Your report has been recorded.", function (){}, "Thanks", "Ok");
+			alert("Thanks! Your report has been recorded.");
 		}
 		$("#reportedContent").prepend("<div class='" + (accessible ? "" : "in") + "accessible'>" + $("#urlField")[0].value + "</div>");
 		if ($("#reportedContent div").length > 4){
@@ -125,6 +120,8 @@ function queueUp(accessibleBoolean){
 		sitesReported++;
 		$("#numberReported").html(sitesReported.toString());
 		resetAllFields();
+		// move on 
+		loadRandomDomain();
 	}
 }
 
@@ -139,39 +136,6 @@ function resetAllFields(){
 	$("#urlField")[0].value = "";
 	$("#commentField")[0].value = "";
 	$(".accessSubmit").removeClass("ui-btn-active");
-}
-
-// empties queue and submits data
-function deQueue(){
-	var db = connectToQueue();
-	db.transaction(function (t){
-		t.executeSql("SELECT * FROM toSendQueue", [], 
-			function (t, r){
-				// send data to server
-				var resultsLen = r.rows.length;
-				for (var i = 0; i < resultsLen; i++){
-					// prep for api
-					// TODO: add report.sourceID
-					var sourceId = "1";
-					// TODO: Replace dev2 with www
-					var reportRequest = "http://dev2.herdict.org/action/ajax/plugin/report?" + (r.rows.item(i).accessible ? "siteAccessible" : "siteInaccessible") + "&report.url=" + encodeURIComponent(r.rows.item(i).url) + "&report.country.shortName=" + encodeURIComponent(r.rows.item(i).country) + "&report.ispName=" + encodeURIComponent(r.rows.item(i).isp) + "&report.location=" + encodeURIComponent(r.rows.item(i).location) + "&report.interest=" + encodeURIComponent(r.rows.item(i).interest) + "&report.reason=" + encodeURIComponent(r.rows.item(i).reason) + "&report.tag=" + encodeURIComponent(r.rows.item(i).category) + "&report.comments=" + encodeURIComponent(r.rows.item(i).comment) + "&defaultCountryCode=" + encodeURIComponent(locationData.countryShort) + "&defaultISPName=" + encodeURIComponent(locationData.ispName) + "&report.sourceId=" + sourceId + "&encoding=ROT13"; 
-					// report 
-					$.ajax({
-						url: reportRequest,
-						complete: (function (idToRemove){
-							return(function (){
-								var db = connectToQueue();
-								db.transaction(function (t){
-									t.executeSql("DELETE FROM toSendQueue WHERE id=?", [idToRemove]);
-								});
-							});
-						})(r.rows.item(i).id)
-					});
-				}
-			}
-		);
-	});
-	 loadRandomDomain();
 }
 
 // functions for domain roulette
@@ -200,7 +164,7 @@ function loadRandomDomain(){
 		else {
 			var randomDomain = randomQueue.pop();
 			if (typeof(randomDomain) === 'undefined'){
-				navigator.notification.alert("You completed the entire " + lists[currentListId] + " list. Nice job!", function (){}, "Wow! Thanks!", "Ok");
+				alert("Wow! You completed the entire " + lists[currentListId] + " list. Nice job!");
 				toggleRandom();
 			}
 			else {
@@ -366,7 +330,7 @@ $(document).on("pagebeforechange", function (e, data){
 // *** viewer ********
 // *******************
 
-// checks accessibility of link
+// checks accessibility of URL
 function checkLink(){
 	var currentURL = $("#urlCheckField")[0].value;
 	currentURL = prepareURL(currentURL);
@@ -435,7 +399,7 @@ $(document).one("pageshow", function (){
 // ** GET TOP SITES **
 // *******************
 
-function getLargestSites(){
+function getTopSites(){
 	$.ajax({
 		url: 'http://www.herdict.org/explore/module/topsites?fc=' + locationData.countryShort,
 		success: function (data, status, jqxhr){
@@ -451,5 +415,5 @@ function getLargestSites(){
 	});
 }
 $(document).ready(function (){
-	$("#topsites").on("pageshow", getLargestSites);
+	$("#topsites").on("pageshow", getTopSites);
 });
