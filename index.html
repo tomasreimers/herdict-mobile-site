@@ -49,11 +49,16 @@
 				<a href="#" data-icon="star" id="randomButton" onclick="toggleRandom()" data-iconpos="notext"></a>
 			</div>
 			<div data-role="content">
-				<iframe src=""></iframe>
+				<div id="iframeHolder">
+					<iframe src=""></iframe>
+					<a href="#" id="frameKillerNotice">
+						The site which would be displayed is causing problems. Click here to open it.
+					</a>
+				</div>
 				<a href="#listSelect" id="queueNotice" data-rel="dialog" data-transition="slidedown">You are currently evaluating websites from <span id="whichList"></span>'s list. Click here to change that.</a>
 				<div id="urlFieldContain">
 					<input id="urlField" placeholder="URL" type="url"/>
-					<a href="#" onclick="openUpLink()" data-role="button" data-iconpos="left" data-theme="a" data-icon="arrow-r" id="iframeLink"></a>
+					<a href="#" onclick="updateIframeLocation()" data-role="button" data-iconpos="left" data-theme="a" data-icon="arrow-r" id="iframeLink"></a>
 					<script type="text/javascript">
 						var currentURL = "";
 						function updateIframeLocation(){
@@ -69,12 +74,14 @@
 						$("#urlField").on("change", updateIframeLocation);
 						function openUpLink(){
 							// framekiller killer
+							$("#frameKillerNotice").css("display", "none");
 							var prevent_bust = 0;
 							window.onbeforeunload = function() { prevent_bust++ };
 							var framekiller = setInterval(function() {
 							  if (prevent_bust > 0) { 
 							    prevent_bust -= 2;
 							    window.top.location = 'ajax/stop';
+							    $("#frameKillerNotice").attr("href", currentURL).css("display", "block");
 							    clearInterval(framekiller);
 							  }
 							}, 1);
@@ -84,6 +91,7 @@
 							}
 							// open url
 							$("iframe")[0].src=currentURL;
+							$("#frameKillerNotice").attr("href", currentURL);
 						}
 						openUpLink();
 					</script>

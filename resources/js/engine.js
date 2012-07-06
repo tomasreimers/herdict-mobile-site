@@ -175,6 +175,9 @@ function loadRandomDomain(){
 					hideFromReporter = randomDomain.site.hideFromReporter;
 					$("#urlField")[0].value = randomDomain.site.url;
 					$("#urlField").trigger("change");
+					if (hideFromReporter){
+						$("#frameKillerNotice").css("display", "block");
+					}
 				}
 			}
 		}
