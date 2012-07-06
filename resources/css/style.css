@@ -38,6 +38,16 @@ body.ui-overlay-c.ui-mobile-viewport {
 	font-size:0;
 	position:relative;
 }
+iframe {
+	width:100%;
+	height:200px;
+	box-sizing:border-box;
+	-moz-box-sizing:border-box;
+	-webkit-box-sizing:border-box;
+	border:1px solid #000;
+	margin-bottom:10px;
+	background-color:#FFF;
+}
 #iframeLink, #checkLink {
 	display:inline-block;
 	width:40px;

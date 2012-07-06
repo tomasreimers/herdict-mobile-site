@@ -49,12 +49,13 @@
 				<a href="#" data-icon="star" id="randomButton" onclick="toggleRandom()" data-iconpos="notext"></a>
 			</div>
 			<div data-role="content">
+				<iframe src=""></iframe>
 				<a href="#listSelect" id="queueNotice" data-rel="dialog" data-transition="slidedown">You are currently evaluating websites from <span id="whichList"></span>'s list. Click here to change that.</a>
 				<div id="urlFieldContain">
 					<input id="urlField" placeholder="URL" type="url"/>
 					<a href="#" onclick="openUpLink()" data-role="button" data-iconpos="left" data-theme="a" data-icon="arrow-r" id="iframeLink"></a>
 					<script type="text/javascript">
-						var currentURL;
+						var currentURL = "";
 						function updateIframeLocation(){
 							var url = $("#urlField")[0].value;
 							if (url != ""){
@@ -67,8 +68,24 @@
 						}
 						$("#urlField").on("change", updateIframeLocation);
 						function openUpLink(){
-							// TODO: Iframe
+							// framekiller killer
+							var prevent_bust = 0;
+							window.onbeforeunload = function() { prevent_bust++ };
+							var framekiller = setInterval(function() {
+							  if (prevent_bust > 0) { 
+							    prevent_bust -= 2;
+							    window.top.location = 'ajax/stop';
+							    clearInterval(framekiller);
+							  }
+							}, 1);
+							// disable the framekiller killer if all goes well
+							$("iframe")[0].onload = function (){
+								clearInterval(framekiller);
+							}
+							// open url
+							$("iframe")[0].src=currentURL;
 						}
+						openUpLink();
 					</script>
 				</div>
 				<a href="#" class="accessSubmit" id="accessibleButton" onclick="queueUp(true)" data-role="button">Accessible</a> 
@@ -154,7 +171,7 @@
 					<div>...or enable random mode</div>
 					<img src="resources/img/walkthrough/random.png" />
 					<h1>Check out the site</h1>
-					<div>A browser will appear showing you the website</div>
+					<div>The frame will load the website</div>
 					<img src="resources/img/walkthrough/childBrowser.png" />
 					<div>When you are done discerning whether the site is accessible, simply hit 'done' on the bottom left</div>
 					<h1>Report Back</h1>

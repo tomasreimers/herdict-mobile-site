@@ -33,8 +33,11 @@ function updateLocationData(){
 $(document).ready(function (){
 	updateLocationData();
 	// Actually put data into select fields when open page
-	// TODO: If you start on #report, this will never fire
 	$("#report").one("pageinit", loadOtherFields);
+	if ($.mobile.activePage[0] === $("#report")[0]){
+		// other binding doesn't fire if you start on #report, because document.ready fires after pageinit
+		loadOtherFields();
+	}
 });
 
 // load the other (non-isp and non-country) fields
@@ -99,8 +102,7 @@ function queueUp(accessibleBoolean){
 		var accessible = (accessibleBoolean ? 1 : 0);
 		var comment = $("#commentField")[0].value;
 		// report
-		// TODO: add report.sourceID
-		var sourceId = "1";
+		var sourceId = "6";
 		// TODO: Replace dev2 with www
 		var reportRequest = "ajax/report?" + (accessibleBoolean ? "siteAccessible" : "siteInaccessible") + "&report.url=" + encodeURIComponent(url) + "&report.country.shortName=" + encodeURIComponent(country) + "&report.ispName=" + encodeURIComponent(isp) + "&report.location=" + encodeURIComponent(location) + "&report.interest=" + encodeURIComponent(interest) + "&report.reason=" + encodeURIComponent(reason) + "&report.tag=" + encodeURIComponent(category) + "&report.comments=" + encodeURIComponent(comment) + "&defaultCountryCode=" + encodeURIComponent(locationData.countryShort) + "&defaultISPName=" + encodeURIComponent(locationData.ispName) + "&report.sourceId=" + sourceId + "&encoding=ROT13"; 
 		$.ajax({
