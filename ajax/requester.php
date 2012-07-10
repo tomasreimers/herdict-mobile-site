@@ -32,5 +32,8 @@
 		else if ($page == "stop"){
 			header("HTTP/1.0 204 No Content");
 		}
+		else if ($page == "lists"){
+			echo(file_get_contents("http://dev2.herdict.org/ajax/lists/sponsored"));
+		}
 	}
 ?>

@@ -3,5 +3,6 @@ RewriteRule ^request/(.*) requester.php?page=$1
 RewriteRule ^topsites/(.*) requester.php?page=topsites&data=$1
 RewriteRule ^site/(.*) requester.php?page=site&data=$1
 RewriteRule ^list/(.*) requester.php?page=list&data=$1
+RewriteRule ^lists requester.php?page=lists
 RewriteRule ^report requester.php?page=report [QSA]
 RewriteRule ^stop requester.php?page=stop
