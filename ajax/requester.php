@@ -21,10 +21,6 @@
 			// explore specific site data
 			echo(file_get_contents("http://www.herdict.org/action/ajax/plugin/site/" . $data));
 		}
-		else if ($page == "list"){
-			// explore lists
-			echo(file_get_contents("http://herdict.podconsulting.net/ajax/lists/" . $data . "/pages"));
-		}
 		else if ($page == "report"){
 			// TODO: Report to actual API
 			echo(file_get_contents("http://dev2.herdict.org/action/ajax/plugin/report?" . $_SERVER['QUERY_STRING']));
@@ -33,7 +29,7 @@
 			header("HTTP/1.0 204 No Content");
 		}
 		else if ($page == "lists"){
-			echo(file_get_contents("http://dev2.herdict.org/ajax/lists/sponsored"));
+			echo(file_get_contents("http://dev2.herdict.org/ajax/lists/" . $data));
 		}
 	}
 ?>
