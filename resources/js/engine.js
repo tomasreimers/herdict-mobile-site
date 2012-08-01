@@ -258,7 +258,8 @@ var remoteLists;
 // a list of lists
 function loadLists(){
 	// clear
-	$('#listSelectList').html('');
+	$('#listSelectList').html('<li>Loading...</li>');
+	$('#listSelectList').listview('refresh');
 	$.ajax({
 		url: 'ajax/lists/sponsored',
 		success: function (data, status, jqxhr){
@@ -288,6 +289,7 @@ function loadLists(){
 
 // actually add lists to select menu
 function doneLoadingLists(){
+	$('#listSelectList').html('');
 	for (var key in lists){
 		$('#listSelectList').prepend("<li><a href='#' onclick='selectList(" + key + ")'>" + lists[key] + "</a></li>");
 	}
