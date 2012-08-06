@@ -23,13 +23,13 @@
 		}
 		else if ($page == "report"){
 			// TODO: Report to actual API
-			echo(file_get_contents("http://dev2.herdict.org/action/ajax/plugin/report?" . $_SERVER['QUERY_STRING']));
+			echo(file_get_contents("http://herdict.org/action/ajax/plugin/report?" . $_SERVER['QUERY_STRING']));
 		}
 		else if ($page == "stop"){
 			header("HTTP/1.0 204 No Content");
 		}
 		else if ($page == "lists"){
-			echo(file_get_contents("http://dev2.herdict.org/ajax/lists/" . $data));
+			echo(file_get_contents("http://herdict.org/ajax/lists/" . $data));
 		}
 	}
 ?>
