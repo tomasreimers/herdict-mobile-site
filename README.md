@@ -11,3 +11,7 @@ The site is almost completely client side with the exception of one ~36 line php
 ## Technologies
 
 The site uses jQuery mobile as its framework. 
+
+## Copyright
+
+Copyright President and Fellows of Harvard College, 2012
