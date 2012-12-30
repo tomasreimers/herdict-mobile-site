@@ -2,7 +2,7 @@
 
 ## About
 
-This provides almost identical functionality to [Herdict Mobile Reporter](https://github.com/berkmancenter/herdict-mobile-reporter) for those who can't/dpn't want to download the app. 
+This provides almost identical functionality to [Herdict Mobile Reporter](https://github.com/berkmancenter/herdict-mobile-reporter) for those who can't/don't want to download the app. 
 
 ## Specs 
 

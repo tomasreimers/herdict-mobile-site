@@ -2,9 +2,9 @@
 	// discern what's being asked of us
 	$page = $_GET['page'];
 	$data = $_GET['data'];
-	// make sure somethign was requested of us
+	// make sure something was requested
 	if (!empty($page)){
-		// make sure we are looking for a legitamate page
+		// make sure we are looking for a legitimate page
 		$pages = array("categories", "countries", "locations", "interests", "reasons");
 		if (array_search($page, $pages) !== false){
 			// plugin selection menu options
@@ -22,7 +22,6 @@
 			echo(file_get_contents("http://www.herdict.org/action/ajax/plugin/site/" . $data));
 		}
 		else if ($page == "report"){
-			// TODO: Report to actual API
 			echo(file_get_contents("http://herdict.org/action/ajax/plugin/report?" . $_SERVER['QUERY_STRING']));
 		}
 		else if ($page == "stop"){
